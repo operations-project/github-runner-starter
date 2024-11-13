@@ -88,20 +88,15 @@ verify() {
   RUNNER_CONFIG_URL="https://github.com/${GITHUB_REPO}"
 
   # Gather API token to create runners.
-  if [[ -z $GITHUB_TOKEN ]]; then
+  if [[ -z "${GITHUB_TOKEN}" ]]; then
     line
     say No GITHUB_TOKEN found.
     say Create a 'Personal Access Token' owned by the organization, with 'admin:write' access on this repository
     say https://github.com/settings/personal-access-tokens/new
     line
-    while [[ -z $GITHUB_TOKEN ]]; do
-      read -s -p "API Token (add to .env file, then hit enter): " GITHUB_TOKEN
-      # Check for new GITHUB_TOKEN in .env file.
-      if [[ -z $GITHUB_TOKEN ]]; then
-        source .env
-        echo
-      fi
-    done
+    exit 1
+  else
+    say "API Token found in GITHUB_TOKEN environment variable."
   fi
 
   # getNewToken.
