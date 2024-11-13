@@ -27,6 +27,7 @@ info() {
   say "Labels: ${RUNNER_CONFIG_LABELS}"
   say "Download path: ${RUNNER_FOLDER}"
   say "This script: ${RUNNER_SCRIPT_PATH}"
+  say "Current Dir: ${CALLER_SCRIPT_DIR}"
 }
 verify() {
 
@@ -41,7 +42,8 @@ verify() {
   else
     RUNNER_SCRIPT_PATH="$COMPOSER_RUNTIME_BIN_DIR"
   fi
-
+  RUNNER_SCRIPT_DIR=$(dirname $RUNNER_SCRIPT_PATH)
+  CALLER_SCRIPT_DIR=$(pwd)
 
   # Defaults. If ENV vars exist, use them. If not, use these values.
   RUNNER_PATH=${RUNNER_PATH:-"runner"}
