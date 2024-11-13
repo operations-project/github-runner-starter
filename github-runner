@@ -22,18 +22,23 @@ welcome() {
   say 3. Run Runner
 }
 info() {
-  say "Name: ${RUNNER_CONFIG_NAME}"
-  say "Repo: ${RUNNER_CONFIG_URL}"
-  say "Labels: ${RUNNER_CONFIG_LABELS}"
   say "Download path: ${RUNNER_FOLDER}"
   say "This script: ${RUNNER_SCRIPT_PATH}"
   say "Current Dir: ${CALLER_SCRIPT_DIR}"
+  say "Environment File: ${RUNNER_SCRIPT_ENV_FILE} ${RUNNER_SCRIPT_ENV_FILE_STATUS}"
+  line
+  say "Runner Name: ${RUNNER_CONFIG_NAME}"
+  say "Repo: ${RUNNER_URL_REPO}"
+  say "Labels: ${RUNNER_CONFIG_LABELS}"
+  say "Status: ${RUNNER_URL_RUNNERS}"
 }
 verify() {
-
-
-  if [[ -f .env ]]; then
-    source .env
+  CALLER_SCRIPT_DIR=$(pwd)
+  RUNNER_SCRIPT_ENV_FILE="${CALLER_SCRIPT_DIR}/.env"
+  if [[ -f "${RUNNER_SCRIPT_ENV_FILE}" ]]; then
+    source $RUNNER_SCRIPT_ENV_FILE
+  else
+    RUNNER_SCRIPT_ENV_FILE_STATUS="(Not found)"
   fi
 
   # Detect composer usage.
@@ -43,7 +48,6 @@ verify() {
     RUNNER_SCRIPT_PATH="$COMPOSER_RUNTIME_BIN_DIR"
   fi
   RUNNER_SCRIPT_DIR=$(dirname $RUNNER_SCRIPT_PATH)
-  CALLER_SCRIPT_DIR=$(pwd)
 
   # Defaults. If ENV vars exist, use them. If not, use these values.
   RUNNER_PATH=${RUNNER_PATH:-"runner"}
@@ -79,6 +83,10 @@ verify() {
       shift $(( $# > 0 ? 1 : 0 ))
   done
 
+  # Helpful URLs
+  RUNNER_URL_REPO="https://github.com/${GITHUB_REPO}"
+  RUNNER_URL_RUNNERS="${RUNNER_URL_REPO}/settings/actions/runners"
+
   line
   welcome
 
@@ -90,7 +98,6 @@ verify() {
 
   # Add name to labels.
   RUNNER_CONFIG_LABELS="${RUNNER_CONFIG_LABELS},${RUNNER_CONFIG_NAME}"
-  RUNNER_CONFIG_URL="https://github.com/${GITHUB_REPO}"
 
   # Gather API token to create runners.
   if [[ -z "${GITHUB_TOKEN}" ]]; then
@@ -159,9 +166,6 @@ download() {
 configure() {
   line
   say Configuring GitHub runner...
-  say Runner Status: ${RUNNER_CONFIG_URL}/settings/actions/runners
-
-  line
   say Removing existing runner...
 
   # Remove
@@ -175,7 +179,7 @@ configure() {
   ./config.sh \
     --token ${RUNNER_CONFIG_TOKEN} \
     --name ${RUNNER_CONFIG_NAME} \
-    --url ${RUNNER_CONFIG_URL} \
+    --url ${RUNNER_URL_REPO} \
     --labels ${RUNNER_CONFIG_LABELS} \
     --replace \
     --unattended
@@ -184,8 +188,6 @@ configure() {
   say GitHub runner configured:
   info
 
-  line
-  say Runner Status: ${RUNNER_CONFIG_URL}/settings/actions/runners
 }
 
 stop() {
