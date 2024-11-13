@@ -124,7 +124,9 @@ verify() {
     line
     info
     line
-    say "Unable to get registration token. Check GITHUB_TOKEN and GITHUB_REPO and try again."
+    say Unable to get registration token. Check GITHUB_TOKEN and GITHUB_REPO and try again.
+    say https://github.com/settings/tokens
+    line
     say $RESPONSE
     line
     exit 1
