@@ -1,0 +1,16 @@
+{
+    "name": "jonpugh/github-runner",
+    "description": "A shell script for launching github runners.",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Jon Pugh",
+            "email": "jon@thinkdrop.net"
+        }
+    ],
+    "require": {},
+    "bin": [
+        "github-runner"
+    ]
+}
