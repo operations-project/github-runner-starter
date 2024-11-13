@@ -32,6 +32,14 @@ info() {
   say "Labels: ${RUNNER_CONFIG_LABELS}"
   say "Status: ${RUNNER_URL_RUNNERS}"
 }
+usage() {
+  say GitHub Runner Script
+  echo "--runner-path (RUNNER_PATH)  The path to download the runner script"
+  echo "--token (GITHUB_TOKEN) A GitHub API token with admin:write permissions on the repo."
+  echo "--repo (GITHUB_REPO) The GitHub repo to install the runner on. (eg. owner/repo)"
+  echo "--name (RUNNER_CONFIG_NAME) The name to give the runner. (Default: $(whoami)@$(hostname -f))"
+  echo "--labels (RUNNER_CONFIG_LABELS) A list of labels to assign to the runner. (Default: $(whoami)@$(hostname -f))"
+}
 verify() {
   CALLER_SCRIPT_DIR=$(pwd)
   RUNNER_SCRIPT_ENV_FILE="${CALLER_SCRIPT_DIR}/.env"
@@ -57,6 +65,11 @@ verify() {
   # Command line Options
   while [ $# -gt 0 ]; do
       case "$1" in
+          --help)
+            usage
+            exit
+            ;;
+
           --runner-path=*)
               RUNNER_PATH="${1#*=}"
               ;;
