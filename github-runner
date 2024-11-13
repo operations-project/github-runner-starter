@@ -14,13 +14,17 @@ start() {
   ./run.sh
 }
 welcome() {
-  line
   say "GitHub Runner | ${RUNNER_SCRIPT_PATH}"
   say Welcome! This script will:
   say 1. Install Runner
   say 2. Configure Runner
   say 3. Run Runner
-  line
+}
+info() {
+  say "Name: ${RUNNER_CONFIG_NAME}"
+  say "Repo: ${RUNNER_CONFIG_URL}"
+  say "Labels: ${RUNNER_CONFIG_LABELS}"
+  say "Download path: ${RUNNER_FOLDER}"
 }
 verify() {
 
@@ -76,6 +80,7 @@ verify() {
     exit 1
   fi
 
+  line
   welcome
 
   # Add name to labels.
@@ -84,6 +89,7 @@ verify() {
 
   # Gather API token to create runners.
   if [[ -z $GITHUB_TOKEN ]]; then
+    line
     say No GITHUB_TOKEN found.
     say Create a 'Personal Access Token' owned by the organization, with 'admin:write' access on this repository
     say https://github.com/settings/personal-access-tokens/new
@@ -99,26 +105,16 @@ verify() {
   fi
 
   # getNewToken.
-  RUNNER_CONFIG_TOKEN=$(newRunnerToken)
   line
+  RUNNER_CONFIG_TOKEN=$(newRunnerToken)
   if [[ -z "$RUNNER_CONFIG_TOKEN" ]]; then
+    line
     say Unable to get new runner token.
     exit 1
   else
-    say New GitHub runner token was created.
+    line
+    say New GitHub runner token was created: $RUNNER_CONFIG_TOKEN
   fi
-
-  say Script Environment:
-  line
-  echo "RUNNER_PATH=${RUNNER_PATH}"
-  echo "RUNNER_CONFIG_NAME=${RUNNER_CONFIG_NAME}"
-  echo "RUNNER_CONFIG_URL=${RUNNER_CONFIG_URL}"
-  echo "RUNNER_CONFIG_LABELS=${RUNNER_CONFIG_LABELS}"
-  line
-
-}
-download() {
-  line
 
   # Prepare runner dir.
   if [[ ! -d $RUNNER_PATH ]]; then
@@ -130,17 +126,25 @@ download() {
     say Found folder: $RUNNER_FOLDER
   fi
 
+  line
+  info
+
+}
+download() {
+
   cd ${RUNNER_FOLDER}
   TAR_PATH="${RUNNER_FOLDER}/actions-runner.tar.gz"
   if [[ ! -f $TAR_PATH ]]; then
-    say "Downloading runner tarball to ${TAR_PATH}..."
     line
+    say "Downloading runner tarball to ${TAR_PATH}..."
     curl -o ${TAR_PATH} -L https://github.com/actions/runner/releases/download/v2.320.0/actions-runner-linux-x64-2.320.0.tar.gz
   else
+    line
     say "Found runner tarball at ${TAR_PATH}..."
   fi
   CONFIG_PATH="${RUNNER_FOLDER}/config.sh"
   if [[ ! -f $CONFIG_PATH ]]; then
+    line
     say Extracting ${TAR_PATH}
     tar xzf ${TAR_PATH}
     say "Runner extracted to ${RUNNER_FOLDER}."
@@ -151,18 +155,17 @@ configure() {
   line
   say Configuring GitHub runner...
   say Runner Status: ${RUNNER_CONFIG_URL}/settings/actions/runners
-  line
-  cd $RUNNER_FOLDER
 
   line
   say Removing existing runner...
-  line
+
   # Remove
+  cd $RUNNER_FOLDER
   ./config.sh remove --token ${RUNNER_CONFIG_TOKEN} || say "config remove didn't work."
 
   line
   say Configuring new runner...
-  line
+
   # Configure
   ./config.sh \
     --token ${RUNNER_CONFIG_TOKEN} \
@@ -171,14 +174,13 @@ configure() {
     --labels ${RUNNER_CONFIG_LABELS} \
     --replace \
     --unattended
+
   line
   say GitHub runner configured:
-  say Name: ${RUNNER_CONFIG_NAME}
-  say Repo: ${RUNNER_CONFIG_URL}
-  say Labels: ${RUNNER_CONFIG_LABELS}
+  info
+
   line
   say Runner Status: ${RUNNER_CONFIG_URL}/settings/actions/runners
-  line
 }
 
 newRunnerToken() {
@@ -213,7 +215,7 @@ cancel() {
   exit 1
 }
 say() {
-  echo " runner.sh | ${*}"
+  echo " github-runner | ${*}"
 }
 line() {
   CHARACTER="${CHARACTER:--}"
