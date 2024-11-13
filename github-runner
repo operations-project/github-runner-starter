@@ -1,0 +1,228 @@
+#!/usr/bin/env bash
+
+set -e
+
+start() {
+  verify "${@}"
+  download
+  configure
+
+  line
+  say Launching runner with run.sh ...
+  line
+  cd $RUNNER_FOLDER
+  ./run.sh
+}
+welcome() {
+  line
+  say "GitHub Runner | ${RUNNER_SCRIPT_PATH}"
+  say Welcome! This script will:
+  say 1. Install Runner
+  say 2. Configure Runner
+  say 3. Run Runner
+  line
+}
+verify() {
+
+
+  if [[ -f .env ]]; then
+    source .env
+  fi
+
+  # Detect composer usage.
+  if [[ -z "$COMPOSER_RUNTIME_BIN_DIR" ]]; then
+    RUNNER_SCRIPT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+  else
+    RUNNER_SCRIPT_PATH="$COMPOSER_RUNTIME_BIN_DIR"
+  fi
+
+
+  # Defaults. If ENV vars exist, use them. If not, use these values.
+  RUNNER_PATH=${RUNNER_PATH:-"runner"}
+  RUNNER_CONFIG_NAME=${RUNNER_CONFIG_NAME:-$(whoami)@$(hostname -f)}
+  RUNNER_CONFIG_LABELS=${RUNNER_CONFIG_LABELS:-"runner.sh"}
+
+  # Command line Options
+  while [ $# -gt 0 ]; do
+      case "$1" in
+          --runner-path=*)
+              RUNNER_PATH="${1#*=}"
+              ;;
+
+          --cleanup-runner)
+              RUNNER_CLEANUP="yes"
+              ;;
+
+          --token=*)
+              GITHUB_TOKEN="${1#*=}"
+              ;;
+
+          --repo=*)
+              GITHUB_REPO="${1#*=}"
+              ;;
+
+          --name=*)
+              RUNNER_CONFIG_NAME="${1#*=}"
+              ;;
+          --labels=*)
+              RUNNER_CONFIG_LABELS="${1#*=}"
+              ;;
+      esac
+      shift $(( $# > 0 ? 1 : 0 ))
+  done
+
+  if [[ -z $GITHUB_REPO ]]; then
+    say GITHUB_REPO is required. Use --repo or set the environment variable.
+    exit 1
+  fi
+
+  welcome
+
+  # Add name to labels.
+  RUNNER_CONFIG_LABELS="${RUNNER_CONFIG_LABELS},${RUNNER_CONFIG_NAME}"
+  RUNNER_CONFIG_URL="https://github.com/${GITHUB_REPO}"
+
+  # Gather API token to create runners.
+  if [[ -z $GITHUB_TOKEN ]]; then
+    say No GITHUB_TOKEN found.
+    say Create a 'Personal Access Token' owned by the organization, with 'admin:write' access on this repository
+    say https://github.com/settings/personal-access-tokens/new
+    line
+    while [[ -z $GITHUB_TOKEN ]]; do
+      read -s -p "API Token (add to .env file, then hit enter): " GITHUB_TOKEN
+      # Check for new GITHUB_TOKEN in .env file.
+      if [[ -z $GITHUB_TOKEN ]]; then
+        source .env
+        echo
+      fi
+    done
+  fi
+
+  # getNewToken.
+  RUNNER_CONFIG_TOKEN=$(newRunnerToken)
+  line
+  if [[ -z "$RUNNER_CONFIG_TOKEN" ]]; then
+    say Unable to get new runner token.
+    exit 1
+  else
+    say New GitHub runner token was created.
+  fi
+
+  say Script Environment:
+  line
+  echo "RUNNER_PATH=${RUNNER_PATH}"
+  echo "RUNNER_CONFIG_NAME=${RUNNER_CONFIG_NAME}"
+  echo "RUNNER_CONFIG_URL=${RUNNER_CONFIG_URL}"
+  echo "RUNNER_CONFIG_LABELS=${RUNNER_CONFIG_LABELS}"
+  line
+
+}
+download() {
+  line
+
+  # Prepare runner dir.
+  if [[ ! -d $RUNNER_PATH ]]; then
+    mkdir -p $RUNNER_PATH
+    RUNNER_FOLDER=$(realpath $RUNNER_PATH)
+    say Created folder: $RUNNER_FOLDER
+  else
+    RUNNER_FOLDER=$(realpath $RUNNER_PATH)
+    say Found folder: $RUNNER_FOLDER
+  fi
+
+  cd ${RUNNER_FOLDER}
+  TAR_PATH="${RUNNER_FOLDER}/actions-runner.tar.gz"
+  if [[ ! -f $TAR_PATH ]]; then
+    say "Downloading runner tarball to ${TAR_PATH}..."
+    line
+    curl -o ${TAR_PATH} -L https://github.com/actions/runner/releases/download/v2.320.0/actions-runner-linux-x64-2.320.0.tar.gz
+  else
+    say "Found runner tarball at ${TAR_PATH}..."
+  fi
+  CONFIG_PATH="${RUNNER_FOLDER}/config.sh"
+  if [[ ! -f $CONFIG_PATH ]]; then
+    say Extracting ${TAR_PATH}
+    tar xzf ${TAR_PATH}
+    say "Runner extracted to ${RUNNER_FOLDER}."
+  fi
+  cd ${OLDPWD}
+}
+configure() {
+  line
+  say Configuring GitHub runner...
+  say Runner Status: ${RUNNER_CONFIG_URL}/settings/actions/runners
+  line
+  cd $RUNNER_FOLDER
+
+  line
+  say Removing existing runner...
+  line
+  # Remove
+  ./config.sh remove --token ${RUNNER_CONFIG_TOKEN} || say "config remove didn't work."
+
+  line
+  say Configuring new runner...
+  line
+  # Configure
+  ./config.sh \
+    --token ${RUNNER_CONFIG_TOKEN} \
+    --name ${RUNNER_CONFIG_NAME} \
+    --url ${RUNNER_CONFIG_URL} \
+    --labels ${RUNNER_CONFIG_LABELS} \
+    --replace \
+    --unattended
+  line
+  say GitHub runner configured:
+  say Name: ${RUNNER_CONFIG_NAME}
+  say Repo: ${RUNNER_CONFIG_URL}
+  say Labels: ${RUNNER_CONFIG_LABELS}
+  line
+  say Runner Status: ${RUNNER_CONFIG_URL}/settings/actions/runners
+  line
+}
+
+newRunnerToken() {
+  RESPONSE=$(curl -L \
+    -X POST \
+    -H "Accept: application/vnd.github+json" \
+    -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+    -H "X-GitHub-Api-Version: 2022-11-28" \
+    https://api.github.com/repos/${GITHUB_REPO}/actions/runners/registration-token \
+  )
+  TOKEN=$(echo $RESPONSE | jq -r .token)
+  echo $TOKEN
+}
+
+stop() {
+  say "Stopped."
+  ./config.sh remove --token ${RUNNER_CONFIG_TOKEN} || say "config remove didn't work."
+
+  exit 0
+}
+cancel() {
+  echo
+  if [[ "${RUNNER_CLEANUP}" == "yes" ]]; then
+    say "Cancelled. Removing $RUNNER_FOLDER..."
+    rm -rf $RUNNER_FOLDER
+  else
+    say "Cancelled. The folder $RUNNER_FOLDER was not deleted."
+  fi
+
+  ./config.sh remove --token ${RUNNER_CONFIG_TOKEN} || say "config remove didn't work."
+
+  exit 1
+}
+say() {
+  echo " runner.sh | ${*}"
+}
+line() {
+  CHARACTER="${CHARACTER:--}"
+  COLUMNS="${COLUMNS:-$(tput cols -T xterm)}"
+  printf '%*s\n' "${COLUMNS}" '' | tr ' ' "${CHARACTER}"
+}
+
+# Set up signal trap
+trap stop SIGTERM
+trap cancel SIGINT
+
+start "${@}"
