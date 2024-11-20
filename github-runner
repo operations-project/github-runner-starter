@@ -36,7 +36,7 @@ usage() {
   say GitHub Runner Script
   echo "--runner-path (RUNNER_PATH)  The path to download the runner script"
   echo "--token (GITHUB_TOKEN) A GitHub API token with admin:write permissions on the repo."
-  echo "--repo (GITHUB_REPO) The GitHub repo to install the runner on. (eg. owner/repo)"
+  echo "--repo (GITHUB_REPOSITORY) The GitHub repo to install the runner on. (eg. owner/repo)"
   echo "--name (RUNNER_CONFIG_NAME) The name to give the runner. (Default: $(whoami)@$(hostname -f))"
   echo "--labels (RUNNER_CONFIG_LABELS) A list of labels to assign to the runner. (Default: $(whoami)@$(hostname -f))"
 }
@@ -83,7 +83,7 @@ verify() {
               ;;
 
           --repo=*)
-              GITHUB_REPO="${1#*=}"
+              GITHUB_REPOSITORY="${1#*=}"
               ;;
 
           --name=*)
@@ -97,15 +97,15 @@ verify() {
   done
 
   # Helpful URLs
-  RUNNER_URL_REPO="https://github.com/${GITHUB_REPO}"
+  RUNNER_URL_REPO="https://github.com/${GITHUB_REPOSITORY}"
   RUNNER_URL_RUNNERS="${RUNNER_URL_REPO}/settings/actions/runners"
 
   line
   welcome
 
-  if [[ -z "${GITHUB_REPO}" ]]; then
+  if [[ -z "${GITHUB_REPOSITORY}" ]]; then
     line
-    say GITHUB_REPO is required. Use --repo or set the environment variable.
+    say GITHUB_REPOSITORY is required. Use --repo or set the environment variable.
     exit 1
   fi
 
@@ -140,14 +140,14 @@ verify() {
     -H "Accept: application/vnd.github+json" \
     -H "Authorization: Bearer ${GITHUB_TOKEN}" \
     -H "X-GitHub-Api-Version: 2022-11-28" \
-    https://api.github.com/repos/${GITHUB_REPO}/actions/runners/registration-token \
+    https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/runners/registration-token \
   )
   RUNNER_CONFIG_TOKEN=$(echo $RESPONSE | jq -r .token)
   if [[ "${RUNNER_CONFIG_TOKEN}" == "null" ]]; then
     line
     info
     line
-    say Unable to get registration token. Check GITHUB_TOKEN and GITHUB_REPO and try again.
+    say Unable to get registration token. Check GITHUB_TOKEN and GITHUB_REPOSITORY and try again.
     say https://github.com/settings/tokens
     line
     say $RESPONSE
