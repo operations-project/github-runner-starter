@@ -60,7 +60,7 @@ verify() {
   # Defaults. If ENV vars exist, use them. If not, use these values.
   RUNNER_PATH=${RUNNER_PATH:-"runner"}
   RUNNER_CONFIG_NAME=${RUNNER_CONFIG_NAME:-$(whoami)@$(hostname -f)}
-  RUNNER_CONFIG_LABELS=${RUNNER_CONFIG_LABELS:-"runner.sh"}
+  RUNNER_CONFIG_LABELS=${RUNNER_CONFIG_LABELS:-"jonpugh/github-runner"}
 
   # Command line Options
   while [ $# -gt 0 ]; do
