@@ -1,0 +1,52 @@
+name: Test
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+env:
+  # https://github.com/jonpugh/github-runner/settings/secrets/actions/JONPUGH_GITHUB_TOKEN_ADMIN
+  GITHUB_TOKEN: "${{ secrets.JONPUGH_GITHUB_TOKEN_ADMIN }}"
+  RUNNER_CONFIG_NAME: "jonpugh@github-runner.${{ github.run_id }}"
+  
+jobs:
+  create:
+    name: Create Runner
+    # Testing github hosted.
+    # runs-on: jonpugh/github-runner
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Debug
+        run: |
+          echo "Who am I: $(whoami)"
+          echo "Hostname: $(hostname -f)"
+          echo "Environment:"
+          env
+
+      - name: Help
+        run: |
+          echo "Hi from .github/workflows/tests.yml!"
+          ./github-runner --help
+
+      - name: Run
+        run: |
+          ./github-runner \
+            --name=${RUNNER_CONFIG_NAME} \
+            --config-sh-options=--ephemeral
+
+  run:
+    name: Run Tasks
+    runs-on: "jonpugh@github-runner.${{ github.run_id }}"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Debug
+        run: |
+          echo "Who am I: $(whoami)"
+          echo "Hostname: $(hostname -f)"
+          echo "Environment:"
+          env
