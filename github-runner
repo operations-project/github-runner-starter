@@ -9,10 +9,18 @@ start() {
   configure
 
   line
-  say Launching runner with run.sh ...
-  line
-  cd $RUNNER_FOLDER
-  ./run.sh
+
+  if [[ -n $RUNNER_RUN ]]; then
+    say Launching runner with run.sh ...
+    line
+    cd $RUNNER_FOLDER
+    ./run.sh
+  else
+    say Launching runner with run.sh ... SKIPPED.
+    say Exiting github-runner.
+    exit
+  fi
+
 }
 welcome() {
   say "GitHub Runner | ${RUNNER_SCRIPT_PATH}"
@@ -62,6 +70,9 @@ verify() {
   RUNNER_CONFIG_NAME=${RUNNER_CONFIG_NAME:-$(whoami)@$(hostname -f)}
   RUNNER_CONFIG_LABELS=${RUNNER_CONFIG_LABELS:-"jonpugh/github-runner"}
 
+  # Whether to run the runner
+  RUNNER_RUN=${RUNNER_RUN:-"yes"}
+
   # Command line Options
   while [ $# -gt 0 ]; do
       case "$1" in
@@ -96,6 +107,12 @@ verify() {
           --config-sh-options=*)
              RUNNER_CONFIG_OPTIONS="${1#*=}"
              ;;
+
+          --no-run)
+              RUNNER_RUN=""
+              ;;
+
+
       esac
       shift $(( $# > 0 ? 1 : 0 ))
   done
