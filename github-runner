@@ -92,6 +92,10 @@ verify() {
           --labels=*)
               RUNNER_CONFIG_LABELS="${1#*=}"
               ;;
+
+          --config-sh-options=*)
+             RUNNER_CONFIG_OPTIONS="${1#*=}"
+             ;;
       esac
       shift $(( $# > 0 ? 1 : 0 ))
   done
@@ -189,13 +193,20 @@ configure() {
   say Configuring new runner...
 
   # Configure
-  ./config.sh \
+  CMD="./config.sh \
     --token ${RUNNER_CONFIG_TOKEN} \
     --name ${RUNNER_CONFIG_NAME} \
     --url ${RUNNER_URL_REPO} \
     --labels ${RUNNER_CONFIG_LABELS} \
     --replace \
-    --unattended
+    --unattended \
+    ${RUNNER_CONFIG_OPTIONS}
+  "
+  line
+  say $CMD
+  line
+
+  $CMD
 
   line
   say GitHub runner configured:
