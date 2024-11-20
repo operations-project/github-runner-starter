@@ -12,7 +12,8 @@ env:
   RUNNER_CONFIG_NAME: "jonpugh@github-runner.${{ github.run_id }}"
   
 jobs:
-  build:
+  create:
+    name: Create Runner
     runs-on: jonpugh/github-runner
     steps:
       - uses: actions/checkout@v4
@@ -36,7 +37,7 @@ jobs:
             --config-sh-options=--ephemeral
 
   run:
-    name: Tasks
+    name: Run Tasks
     runs-on: "jonpugh@github-runner.${{ github.run_id }}"
     steps:
       - uses: actions/checkout@v4
