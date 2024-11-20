@@ -14,7 +14,9 @@ env:
 jobs:
   create:
     name: Create Runner
-    runs-on: jonpugh/github-runner
+    # Testing github hosted.
+    # runs-on: jonpugh/github-runner
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
