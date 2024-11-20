@@ -9,7 +9,7 @@ on:
 env:
   # https://github.com/jonpugh/github-runner/settings/secrets/actions/JONPUGH_GITHUB_TOKEN_ADMIN
   GITHUB_TOKEN: "${{ secrets.JONPUGH_GITHUB_TOKEN_ADMIN }}"
-  RUNNER_CONFIG_NAME: "jonpugh/github-runner/${{ github.run_id }}"
+  RUNNER_CONFIG_NAME: "jonpugh@github-runner.${{ github.run_id }}"
   
 jobs:
   build:
