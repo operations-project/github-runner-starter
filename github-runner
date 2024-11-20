@@ -36,7 +36,7 @@ usage() {
   say GitHub Runner Script
   echo "--runner-path (RUNNER_PATH)  The path to download the runner script"
   echo "--token (GITHUB_TOKEN) A GitHub API token with admin:write permissions on the repo."
-  echo "--repo (GITHUB_REPO) The GitHub repo to install the runner on. (eg. owner/repo)"
+  echo "--repo (GITHUB_REPOSITORY) The GitHub repo to install the runner on. (eg. owner/repo)"
   echo "--name (RUNNER_CONFIG_NAME) The name to give the runner. (Default: $(whoami)@$(hostname -f))"
   echo "--labels (RUNNER_CONFIG_LABELS) A list of labels to assign to the runner. (Default: $(whoami)@$(hostname -f))"
 }
@@ -60,7 +60,7 @@ verify() {
   # Defaults. If ENV vars exist, use them. If not, use these values.
   RUNNER_PATH=${RUNNER_PATH:-"runner"}
   RUNNER_CONFIG_NAME=${RUNNER_CONFIG_NAME:-$(whoami)@$(hostname -f)}
-  RUNNER_CONFIG_LABELS=${RUNNER_CONFIG_LABELS:-"runner.sh"}
+  RUNNER_CONFIG_LABELS=${RUNNER_CONFIG_LABELS:-"jonpugh/github-runner"}
 
   # Command line Options
   while [ $# -gt 0 ]; do
@@ -83,7 +83,7 @@ verify() {
               ;;
 
           --repo=*)
-              GITHUB_REPO="${1#*=}"
+              GITHUB_REPOSITORY="${1#*=}"
               ;;
 
           --name=*)
@@ -92,20 +92,24 @@ verify() {
           --labels=*)
               RUNNER_CONFIG_LABELS="${1#*=}"
               ;;
+
+          --config-sh-options=*)
+             RUNNER_CONFIG_OPTIONS="${1#*=}"
+             ;;
       esac
       shift $(( $# > 0 ? 1 : 0 ))
   done
 
   # Helpful URLs
-  RUNNER_URL_REPO="https://github.com/${GITHUB_REPO}"
+  RUNNER_URL_REPO="https://github.com/${GITHUB_REPOSITORY}"
   RUNNER_URL_RUNNERS="${RUNNER_URL_REPO}/settings/actions/runners"
 
   line
   welcome
 
-  if [[ -z "${GITHUB_REPO}" ]]; then
+  if [[ -z "${GITHUB_REPOSITORY}" ]]; then
     line
-    say GITHUB_REPO is required. Use --repo or set the environment variable.
+    say GITHUB_REPOSITORY is required. Use --repo or set the environment variable.
     exit 1
   fi
 
@@ -140,14 +144,14 @@ verify() {
     -H "Accept: application/vnd.github+json" \
     -H "Authorization: Bearer ${GITHUB_TOKEN}" \
     -H "X-GitHub-Api-Version: 2022-11-28" \
-    https://api.github.com/repos/${GITHUB_REPO}/actions/runners/registration-token \
+    https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/runners/registration-token \
   )
   RUNNER_CONFIG_TOKEN=$(echo $RESPONSE | jq -r .token)
   if [[ "${RUNNER_CONFIG_TOKEN}" == "null" ]]; then
     line
     info
     line
-    say Unable to get registration token. Check GITHUB_TOKEN and GITHUB_REPO and try again.
+    say Unable to get registration token. Check GITHUB_TOKEN and GITHUB_REPOSITORY and try again.
     say https://github.com/settings/tokens
     line
     say $RESPONSE
@@ -189,13 +193,20 @@ configure() {
   say Configuring new runner...
 
   # Configure
-  ./config.sh \
+  CMD="./config.sh \
     --token ${RUNNER_CONFIG_TOKEN} \
     --name ${RUNNER_CONFIG_NAME} \
     --url ${RUNNER_URL_REPO} \
     --labels ${RUNNER_CONFIG_LABELS} \
     --replace \
-    --unattended
+    --unattended \
+    ${RUNNER_CONFIG_OPTIONS}
+  "
+  line
+  say $CMD
+  line
+
+  $CMD
 
   line
   say GitHub runner configured:
