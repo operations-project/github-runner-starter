@@ -15,6 +15,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Debug
+        run: |
+          echo "Who am I: $(whoami)"
+          echo "Hostname: $(hostname -f)
+          echo "Environment:"
+          env
+
       - name: Help
         run: |
           echo "Hi from .github/workflows/tests.yml!"
