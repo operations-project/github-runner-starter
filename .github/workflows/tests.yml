@@ -9,7 +9,7 @@ on:
 env:
   # https://github.com/jonpugh/github-runner/settings/secrets/actions/JONPUGH_GITHUB_TOKEN_ADMIN
   GITHUB_TOKEN: "${{ secrets.JONPUGH_GITHUB_TOKEN_ADMIN }}"
-  RUNNER_CONFIG_NAME: "jonpugh/github-runner:${{ github.run_id }}"
+  RUNNER_CONFIG_NAME: "jonpugh/github-runner/${{ github.run_id }}"
   
 jobs:
   build:
@@ -32,4 +32,15 @@ jobs:
       - name: Run
         run: |
           ./github-runner
-          
+
+  run:
+    runs-on: "jonpugh/github-runner/${{ github.run_id }}"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Debug
+        run: |
+          echo "Who am I: $(whoami)"
+          echo "Hostname: $(hostname -f)"
+          echo "Environment:"
+          env
