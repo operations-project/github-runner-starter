@@ -1,0 +1,23 @@
+name: Test
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: jonpugh/github-runner
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Help
+        run: |
+          echo "Hi from .github/workflows/tests.yml!"
+          ./github-runner --help
+
+      - name: Run
+        run: |
+          ./github-runner
+          
