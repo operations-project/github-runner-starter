@@ -7,8 +7,8 @@ on:
   workflow_dispatch:
 
 env:
-  GITHUB_REPO: jonpugh/github-runner
-  GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+  # https://github.com/jonpugh/github-runner/settings/secrets/actions/JONPUGH_GITHUB_TOKEN_ADMIN
+  GITHUB_TOKEN: "${{ secrets.JONPUGH_GITHUB_TOKEN_ADMIN }}"
   
 jobs:
   build:
