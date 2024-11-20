@@ -43,10 +43,13 @@ info() {
 usage() {
   say GitHub Runner Script
   echo "--runner-path (RUNNER_PATH)  The path to download the runner script"
+  echo "--cleanup-runner     Remove the runner scripts at the end."
   echo "--token (GITHUB_TOKEN) A GitHub API token with admin:write permissions on the repo."
   echo "--repo (GITHUB_REPOSITORY) The GitHub repo to install the runner on. (eg. owner/repo)"
   echo "--name (RUNNER_CONFIG_NAME) The name to give the runner. (Default: $(whoami)@$(hostname -f))"
   echo "--labels (RUNNER_CONFIG_LABELS) A list of labels to assign to the runner. (Default: $(whoami)@$(hostname -f))"
+  echo "--no-run (RUNNER_RUN)    If empty, don't run."
+  echo "--config-sh-options (RUNNER_CONFIG_OPTIONS) Pass options to the github runner config.sh command."
 }
 verify() {
   CALLER_SCRIPT_DIR=$(pwd)
@@ -69,6 +72,7 @@ verify() {
   RUNNER_PATH=${RUNNER_PATH:-"runner"}
   RUNNER_CONFIG_NAME=${RUNNER_CONFIG_NAME:-$(whoami)@$(hostname -f)}
   RUNNER_CONFIG_LABELS=${RUNNER_CONFIG_LABELS:-"jonpugh/github-runner"}
+  RUNNER_CONFIG_OPTIONS=${RUNNER_CONFIG_OPTIONS:-""}
 
   # Whether to run the runner
   RUNNER_RUN=${RUNNER_RUN:-"yes"}
