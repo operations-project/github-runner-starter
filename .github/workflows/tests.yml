@@ -37,7 +37,7 @@ jobs:
 
   run:
     name: Tasks
-    runs-on: ${{ env.RUNNER_CONFIG_NAME }}
+    runs-on: "jonpugh@github-runner.${{ github.run_id }}"
     steps:
       - uses: actions/checkout@v4
 
