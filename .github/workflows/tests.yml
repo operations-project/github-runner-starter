@@ -8,6 +8,7 @@ on:
 
 env:
   GITHUB_REPO: jonpugh/github-runner
+  GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
   
 jobs:
   build:
