@@ -31,10 +31,13 @@ jobs:
 
       - name: Run
         run: |
-          ./github-runner
+          ./github-runner \
+            --name=${RUNNER_CONFIG_NAME} \
+            --config-sh-options=--ephemeral
 
   run:
-    runs-on: "jonpugh/github-runner/${{ github.run_id }}"
+    name: Tasks
+    runs-on: ${{ env.RUNNER_CONFIG_NAME }}
     steps:
       - uses: actions/checkout@v4
 
