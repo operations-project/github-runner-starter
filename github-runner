@@ -76,6 +76,7 @@ verify() {
 
   # Whether to run the runner
   RUNNER_RUN=${RUNNER_RUN:-"yes"}
+  RUNNER_CONFIG=${RUNNER_CONFIG:-"yes"}
 
   # Command line Options
   while [ $# -gt 0 ]; do
@@ -114,6 +115,10 @@ verify() {
 
           --no-run)
               RUNNER_RUN=""
+              ;;
+
+          --no-config)
+              RUNNER_CONFIG=""
               ;;
 
 
