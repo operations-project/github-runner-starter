@@ -6,7 +6,15 @@ start() {
   verify "${@}"
   info
   download
-  configure
+
+
+  if [[ -n $RUNNER_CONFIG ]]; then
+    say Launching runner with run.sh ...
+    line
+    configure
+  else
+    say Configuring runner with config.sh ... SKIPPED.
+  fi
 
   line
 
@@ -18,7 +26,6 @@ start() {
   else
     say Launching runner with run.sh ... SKIPPED.
     say Exiting github-runner.
-    exit
   fi
 
 }
