@@ -30,13 +30,16 @@ start() {
 
 }
 welcome() {
-  say "GitHub Runner | ${RUNNER_SCRIPT_PATH}"
+  say "GitHub Runner"
   say Welcome! This script will:
   say 1. Install Runner
   say 2. Configure Runner
   say 3. Run Runner
 }
 info() {
+  say "User: $(whoami)"
+  say "Host: $(hostname -f)"
+  line
   say "Download path: ${RUNNER_FOLDER}"
   say "This script: ${RUNNER_SCRIPT_PATH}"
   say "Current Dir: ${CALLER_SCRIPT_DIR}"
@@ -140,27 +143,35 @@ verify() {
   line
   welcome
 
-  if [[ -z "${GITHUB_REPOSITORY}" ]]; then
-    line
-    say GITHUB_REPOSITORY is required. Use --repo or set the environment variable.
-    exit 1
-  fi
+  if [[ -n "${RUNNER_CONFIG}" ]]; then
+    if [[ -z "${GITHUB_REPOSITORY}" ]]; then
+      line
+      say GITHUB_REPOSITORY is required. Use --repo or set the environment variable.
+      exit 1
+    fi
 
-  # Add name to labels.
-  RUNNER_CONFIG_LABELS="${RUNNER_CONFIG_LABELS},${RUNNER_CONFIG_NAME}"
+    # Add name to labels.
+    RUNNER_CONFIG_LABELS="${RUNNER_CONFIG_LABELS},${RUNNER_CONFIG_NAME}"
 
-  # Gather API token to create runners.
-  if [[ -z "${GITHUB_TOKEN}" ]]; then
-    line
-    say GITHUB_TOKEN is required. Use --token or set the environment variable.
-    say Create a 'Personal Access Token' owned by the organization, with 'admin:write' access on this repository
-    say https://github.com/settings/personal-access-tokens/new
-    line
-    exit 1
+    # Gather API token to create runners.
+    if [[ -z "${GITHUB_TOKEN}" ]]; then
+      line
+      say GITHUB_TOKEN is required. Use --token or set the environment variable.
+      say Create a 'Personal Access Token' owned by the organization, with 'admin:write' access on this repository
+      say https://github.com/settings/personal-access-tokens/new
+      line
+      exit 1
+    fi
   fi
 
   # Prepare runner dir.
   line
+  say "User: $(whoami)"
+  say "Host: $(hostname -f)"
+  say "Current directory: $(pwd)"
+  say "Runner download path: $RUNNER_PATH"
+  line
+
   if [[ ! -d $RUNNER_PATH ]]; then
     mkdir -p $RUNNER_PATH
     RUNNER_FOLDER=$(realpath $RUNNER_PATH)
@@ -169,6 +180,9 @@ verify() {
     RUNNER_FOLDER=$(realpath $RUNNER_PATH)
     say Found folder: $RUNNER_FOLDER
   fi
+
+  line
+  info
 
   # getNewToken.
   line

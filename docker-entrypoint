@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+set -e
+
+# @TODO: ENV vars don't seem to be working.
+./github-runner --runner-path=$RUNNER_PATH
