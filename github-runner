@@ -22,7 +22,13 @@ start() {
     say Launching runner with run.sh ...
     line
     cd $RUNNER_FOLDER
-    ./run.sh
+
+    # Run.sh in a new process.
+    ./run.sh &
+    RUNNER_PID=$!
+    say "Run.sh PID: $RUNNER_PID"
+    wait $RUNNER_PID
+
   else
     say Launching runner with run.sh ... SKIPPED.
     say Exiting github-runner.
@@ -30,7 +36,7 @@ start() {
 
 }
 welcome() {
-  say "GitHub Runner | ${RUNNER_SCRIPT_PATH}"
+  say "GitHub Runner"
   say Welcome! This script will:
   say 1. Install Runner
   say 2. Configure Runner
@@ -67,11 +73,17 @@ verify() {
     RUNNER_SCRIPT_ENV_FILE_STATUS="(Not found)"
   fi
 
-  # Detect composer usage.
+  # Detect path to this script.
+  # @TODO: Rename RUNNER_SCRIPT_ to reduce confusion with github runner CLI
   if [[ -z "$COMPOSER_RUNTIME_BIN_DIR" ]]; then
-    RUNNER_SCRIPT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+    RUNNER_SCRIPT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/github-runner"
   else
-    RUNNER_SCRIPT_PATH="$COMPOSER_RUNTIME_BIN_DIR"
+    RUNNER_SCRIPT_PATH="$COMPOSER_RUNTIME_BIN_DIR/github-runner"
+  fi
+  if [[ ! -f "${RUNNER_SCRIPT_PATH}" ]]; then
+     say "Path detection failed."
+     say "No file found at ${RUNNER_SCRIPT_PATH}"
+     exit 1
   fi
   RUNNER_SCRIPT_DIR=$(dirname $RUNNER_SCRIPT_PATH)
 
@@ -140,27 +152,35 @@ verify() {
   line
   welcome
 
-  if [[ -z "${GITHUB_REPOSITORY}" ]]; then
-    line
-    say GITHUB_REPOSITORY is required. Use --repo or set the environment variable.
-    exit 1
-  fi
+  if [[ -n "${RUNNER_CONFIG}" ]]; then
+    if [[ -z "${GITHUB_REPOSITORY}" ]]; then
+      line
+      say GITHUB_REPOSITORY is required. Use --repo or set the environment variable.
+      exit 1
+    fi
 
-  # Add name to labels.
-  RUNNER_CONFIG_LABELS="${RUNNER_CONFIG_LABELS},${RUNNER_CONFIG_NAME}"
+    # Add name to labels.
+    RUNNER_CONFIG_LABELS="${RUNNER_CONFIG_LABELS},${RUNNER_CONFIG_NAME}"
 
-  # Gather API token to create runners.
-  if [[ -z "${GITHUB_TOKEN}" ]]; then
-    line
-    say GITHUB_TOKEN is required. Use --token or set the environment variable.
-    say Create a 'Personal Access Token' owned by the organization, with 'admin:write' access on this repository
-    say https://github.com/settings/personal-access-tokens/new
-    line
-    exit 1
+    # Gather API token to create runners.
+    if [[ -z "${GITHUB_TOKEN}" ]]; then
+      line
+      say GITHUB_TOKEN is required. Use --token or set the environment variable.
+      say Create a 'Personal Access Token' owned by the organization, with 'admin:write' access on this repository
+      say https://github.com/settings/personal-access-tokens/new
+      line
+      exit 1
+    fi
   fi
 
   # Prepare runner dir.
   line
+  say "User: $(whoami)"
+  say "Host: $(hostname -f)"
+  say "Current directory: $(pwd)"
+  say "Runner download path: $RUNNER_PATH"
+  line
+
   if [[ ! -d $RUNNER_PATH ]]; then
     mkdir -p $RUNNER_PATH
     RUNNER_FOLDER=$(realpath $RUNNER_PATH)
@@ -169,6 +189,9 @@ verify() {
     RUNNER_FOLDER=$(realpath $RUNNER_PATH)
     say Found folder: $RUNNER_FOLDER
   fi
+
+  line
+  info
 
   # getNewToken.
   line
@@ -248,13 +271,15 @@ configure() {
 }
 
 stop() {
-  say "Stopped."
+  say "Stopped. Run.sh PID: $RUNNER_PID"
+  kill $RUNNER_PID
   ./config.sh remove --token ${RUNNER_CONFIG_TOKEN} || say "config remove didn't work."
 
   exit 0
 }
 cancel() {
-  echo
+  say "Cancelled. Run.sh PID: $RUNNER_PID"
+  kill $RUNNER_PID
   if [[ "${RUNNER_CLEANUP}" == "yes" ]]; then
     say "Cancelled. Removing $RUNNER_FOLDER..."
     rm -rf $RUNNER_FOLDER
