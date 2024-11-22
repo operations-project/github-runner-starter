@@ -11,5 +11,5 @@ services:
     environment:
       GITHUB_TOKEN: ${GITHUB_TOKEN}
       GITHUB_REPOSITORY: jonpugh/github-runner
-    entrypoint: /github-runner/docker-entrypoint
+    entrypoint: /github-runner/github-runner
     build: ./
