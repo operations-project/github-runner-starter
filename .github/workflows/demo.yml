@@ -1,0 +1,17 @@
+name: Demo
+on:
+  push:
+    branches: [ "feature/docker-container" ]
+  workflow_dispatch:
+
+jobs:
+  demo:
+    name: Demonstrate runner
+    runs-on: runner@localhost.runner
+    steps:
+      - name: Debug
+        run: |
+          echo "Who am I: $(whoami)"
+          echo "Hostname: $(hostname -f)"
+          echo "Environment:"
+          env
