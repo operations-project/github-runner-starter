@@ -15,8 +15,9 @@ RUN chown runner:runner . -R
 # GitHub Runner code.
 # Install runner to a path that won't ever be in a volume.
 ENV RUNNER_PATH /usr/share/github-runner
-RUN mkdir $RUNNER_PATH && chown runner:runner $RUNNER_PATH -R
+# We are installing as root then switching back because we need to use the install-dependencies script.
+RUN ./github-runner --no-run --no-config --runner-path=${RUNNER_PATH}
+RUN ${RUNNER_PATH}/bin/installdependencies.sh
+RUN chown runner:runner ${RUNNER_PATH} -R
 
 USER runner
-RUN ./github-runner --no-run --no-config \
-       --runner-path=${RUNNER_PATH}
