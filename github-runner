@@ -37,9 +37,6 @@ welcome() {
   say 3. Run Runner
 }
 info() {
-  say "User: $(whoami)"
-  say "Host: $(hostname -f)"
-  line
   say "Download path: ${RUNNER_FOLDER}"
   say "This script: ${RUNNER_SCRIPT_PATH}"
   say "Current Dir: ${CALLER_SCRIPT_DIR}"
@@ -70,11 +67,17 @@ verify() {
     RUNNER_SCRIPT_ENV_FILE_STATUS="(Not found)"
   fi
 
-  # Detect composer usage.
+  # Detect path to this script.
+  # @TODO: Rename RUNNER_SCRIPT_ to reduce confusion with github runner CLI
   if [[ -z "$COMPOSER_RUNTIME_BIN_DIR" ]]; then
-    RUNNER_SCRIPT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+    RUNNER_SCRIPT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/github-runner"
   else
-    RUNNER_SCRIPT_PATH="$COMPOSER_RUNTIME_BIN_DIR"
+    RUNNER_SCRIPT_PATH="$COMPOSER_RUNTIME_BIN_DIR/github-runner"
+  fi
+  if [[ ! -f "${RUNNER_SCRIPT_PATH}" ]]; then
+     say "Path detection failed."
+     say "No file found at ${RUNNER_SCRIPT_PATH}"
+     exit 1
   fi
   RUNNER_SCRIPT_DIR=$(dirname $RUNNER_SCRIPT_PATH)
 
