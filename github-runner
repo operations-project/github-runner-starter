@@ -22,7 +22,13 @@ start() {
     say Launching runner with run.sh ...
     line
     cd $RUNNER_FOLDER
-    ./run.sh
+
+    # Run.sh in a new process.
+    ./run.sh &
+    RUNNER_PID=$!
+    say "Run.sh PID: $RUNNER_PID"
+    wait $RUNNER_PID
+
   else
     say Launching runner with run.sh ... SKIPPED.
     say Exiting github-runner.
@@ -265,13 +271,15 @@ configure() {
 }
 
 stop() {
-  say "Stopped."
+  say "Stopped. Run.sh PID: $RUNNER_PID"
+  kill $RUNNER_PID
   ./config.sh remove --token ${RUNNER_CONFIG_TOKEN} || say "config remove didn't work."
 
   exit 0
 }
 cancel() {
-  echo
+  say "Cancelled. Run.sh PID: $RUNNER_PID"
+  kill $RUNNER_PID
   if [[ "${RUNNER_CLEANUP}" == "yes" ]]; then
     say "Cancelled. Removing $RUNNER_FOLDER..."
     rm -rf $RUNNER_FOLDER
