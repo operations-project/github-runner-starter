@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+
+#
+# This is an example entrypoint that demonstrates how to name runners after the
+# docker container index.
+#
+# echo "main" > ./runners/runner1
+# echo "siteA" > ./runners/runner2
+# echo "siteB" > ./runners/runner3
+# echo "siteC" > ./runners/runner4
+#
+# docker-compose --scale runner=4
+#
+# Then, this script will generate a runner name based on the contents of those files.
+#
+
+set -e
+
+start() {
+  export RUNNER_NUMBER=$(./whichami)
+
+  # Load the runner name from files in the repo.
+  export RUNNER_CONFIG_NAME="$(cat runners/runner${RUNNER_NUMBER})@$(hostname -f)"
+
+  # Set a global label for each project's runner.
+  export RUNNER_CONFIG_LABELS="$(cat runners/runner${RUNNER_NUMBER})@project"
+
+  line
+  say "Welcome to docker-entrypoint."
+  say "Launching runner ${RUNNER_CONFIG_NAME}..."
+  line
+  exec "${@}"
+
+}
+say() {
+  echo " git-runners-entrypoint | ${*}"
+}
+line() {
+  CHARACTER="${CHARACTER:--}"
+  COLUMNS="${COLUMNS:-$(tput cols -T xterm)}"
+  printf '%*s\n' "${COLUMNS}" '' | tr ' ' "${CHARACTER}"
+}
+
+start "${@}"
