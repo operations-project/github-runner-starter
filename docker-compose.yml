@@ -13,3 +13,6 @@ services:
       GITHUB_REPOSITORY: jonpugh/github-runner
     entrypoint: /github-runner/github-runner
     build: ./
+
+    # Give the containers more time to shutdown before being cancelled.
+    stop_grace_period: 10s
