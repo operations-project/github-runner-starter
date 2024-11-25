@@ -1,7 +1,11 @@
 #!/bin/bash
 
-# Detect the index and count of this container service.
+# Detect the scale index and total count of this container service.
 # Thanks! https://stackoverflow.com/a/64799824
+
+# Usage
+#   whichami   return the index number of this container.
+#   whichami --count   return the total number of containers.
 
 # get the container IP
 IP=`ifconfig eth0 | grep 'inet ' | awk '{print $2}'`
@@ -17,5 +21,9 @@ COUNT=`dig $SERVICE +short | wc -l`
 # extract the replica number from the same PTR entry
 INDEX=`dig -x $IP +short | sed 's/.*_\([0-9]*\)\..*/\1/'`
 
-# Hello I'm container 1 of 5 
-echo "Hello I'm container $INDEX of $COUNT"
+# Echo index or count.
+if [[ "${*}" == "--count" ]]; then
+  echo $COUNT
+else
+  echo $INDEX
+fi
