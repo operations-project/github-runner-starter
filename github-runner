@@ -238,12 +238,13 @@ latestVersion() {
     https://api.github.com/repos/${RUNNER_CLI_REPO}/releases | \
     jq -r '.[0].name'
 }
+# @TODO: Detect curl fail
 download() {
   cd ${RUNNER_FOLDER}
   TAR_PATH="${RUNNER_FOLDER}/actions-runner.tar.gz"
   RUNNER_CLI_VERSION="${RUNNER_CLI_VERSION:-$(latestVersion)}"
   RUNNER_CLI_VERSION=${RUNNER_CLI_VERSION/?}
-  RUNNER_CLI_ARCH="${RUNNER_CLI_VERSION:-$(currentArchitecture)}"
+  RUNNER_CLI_ARCH="${RUNNER_CLI_ARCH:-$(currentArchitecture)}"
   if [[ -z "${RUNNER_CLI_VERSION}" ]]; then
     say "Unable to determine CLI version. Check GITHUB_TOKEN."
     exit 1
