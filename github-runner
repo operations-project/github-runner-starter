@@ -228,8 +228,14 @@ latestVersion() {
 download() {
   cd ${RUNNER_FOLDER}
   TAR_PATH="${RUNNER_FOLDER}/actions-runner.tar.gz"
-  RUNNER_CLI_VERSION=${RUNNER_CLI_VERSION:-${latestVersion}}
+  RUNNER_CLI_VERSION=${RUNNER_CLI_VERSION:-$(latestVersion)}
+#  RUNNER_CLI_VERSION=
+  if [[ -z "${RUNNER_CLI_VERSION}" ]]; then
+    say "Unable to determine CLI version. Check GITHUB_TOKEN."
+    exit 1
+  fi
   TAR_URL="https://github.com/actions/runner/releases/download/${RUNNER_CLI_VERSION}/actions-runner-linux-x64-${RUNNER_CLI_VERSION}.tar.gz"
+  say "Downloading ${TAR_URL}"
   if [[ ! -f $TAR_PATH ]]; then
     line
     say "Downloading runner tarball to ${TAR_PATH}..."
