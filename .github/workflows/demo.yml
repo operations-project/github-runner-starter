@@ -7,7 +7,10 @@ on:
 jobs:
   demo:
     name: Demonstrate runner
-    runs-on: runner1@localhost
+    runs-on: "runner${{ matrix.runner }}@localhost"
+    strategy:
+      matrix:
+        runner: [1, 2, 3, 4, 5]
     steps:
       - name: Debug
         run: |
