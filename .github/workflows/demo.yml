@@ -7,7 +7,7 @@ on:
 jobs:
   demo:
     name: Demonstrate runner
-    runs-on: runner@localhost.runner
+    runs-on: runner1@localhost
     steps:
       - name: Debug
         run: |
