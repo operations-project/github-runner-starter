@@ -18,3 +18,4 @@ jobs:
           echo "Hostname: $(hostname -f)"
           echo "Environment:"
           env
+          ping google.com -c10
