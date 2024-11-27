@@ -215,14 +215,50 @@ verify() {
     exit 1
   fi
 }
+currentArchitecture() {
+  architecture=$(uname -m)
+  case "$architecture" in
+      x86_64)
+          echo "x64"
+          ;;
+      aarch64 | arm64)
+          echo "arm64"
+          ;;
+      *)
+          exit 1
+          ;;
+  esac
+}
+latestVersion() {
+  RUNNER_CLI_REPO=actions/runner
+  curl -s -L \
+    -H "Accept: application/vnd.github+json" \
+    -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+    -H "X-GitHub-Api-Version: 2022-11-28" \
+    https://api.github.com/repos/${RUNNER_CLI_REPO}/releases | \
+    jq -r '.[0].name'
+}
+# @TODO: Detect curl fail
 download() {
-
   cd ${RUNNER_FOLDER}
   TAR_PATH="${RUNNER_FOLDER}/actions-runner.tar.gz"
+  RUNNER_CLI_VERSION="${RUNNER_CLI_VERSION:-$(latestVersion)}"
+  RUNNER_CLI_VERSION=${RUNNER_CLI_VERSION/?}
+  RUNNER_CLI_ARCH="${RUNNER_CLI_ARCH:-$(currentArchitecture)}"
+  if [[ -z "${RUNNER_CLI_VERSION}" ]]; then
+    say "Unable to determine CLI version. Check GITHUB_TOKEN."
+    exit 1
+  fi
+  if [[ -z "${RUNNER_CLI_ARCH}" ]]; then
+    say "Unable to determine architecture using 'uname -m'."
+    exit 1
+  fi
+  TAR_URL="https://github.com/actions/runner/releases/download/v${RUNNER_CLI_VERSION}/actions-runner-linux-${RUNNER_CLI_ARCH}-${RUNNER_CLI_VERSION}.tar.gz"
+  say "Downloading ${TAR_URL}"
   if [[ ! -f $TAR_PATH ]]; then
     line
     say "Downloading runner tarball to ${TAR_PATH}..."
-    curl -o ${TAR_PATH} -L https://github.com/actions/runner/releases/download/v2.320.0/actions-runner-linux-x64-2.320.0.tar.gz
+    curl -o ${TAR_PATH} -L ${TAR_URL}
   else
     line
     say "Found runner tarball at ${TAR_PATH}..."
@@ -242,6 +278,7 @@ configure() {
   say Removing existing runner...
 
   # Remove
+  # @TODO: If runner has a job, wait for it to complete.
   cd $RUNNER_FOLDER
   ./config.sh remove --token ${RUNNER_CONFIG_TOKEN} || say "config remove didn't work."
 

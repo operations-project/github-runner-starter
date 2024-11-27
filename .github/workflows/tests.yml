@@ -10,13 +10,23 @@ env:
   # https://github.com/jonpugh/github-runner/settings/secrets/actions/JONPUGH_GITHUB_TOKEN_ADMIN
   GITHUB_TOKEN: "${{ secrets.JONPUGH_GITHUB_TOKEN_ADMIN }}"
   RUNNER_CONFIG_NAME: "jonpugh@github-runner.${{ github.run_id }}"
-  
+
 jobs:
   create:
     name: Create Runner
     # Testing github hosted.
     # runs-on: jonpugh/github-runner
     runs-on: ubuntu-latest
+    env:
+      # Set unique name for each item in the matrix.
+      RUNNER_CONFIG_NAME: "jonpugh@github-runner.${{ github.run_id }}.${{ matrix.runner }}"
+
+      # Add consistent label for all runners.
+      RUNNER_CONFIG_LABELS: "jonpugh@github-runner.${{ github.run_id }}"
+
+    strategy:
+      matrix:
+        runner: [1,2,3,4,5]
     steps:
       - uses: actions/checkout@v4
 
@@ -41,6 +51,9 @@ jobs:
   run:
     name: Run Tasks
     runs-on: "jonpugh@github-runner.${{ github.run_id }}"
+    strategy:
+      matrix:
+        runner: [1,2,3,4,5]
     steps:
       - uses: actions/checkout@v4
 

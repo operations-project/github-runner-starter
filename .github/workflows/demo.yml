@@ -7,11 +7,15 @@ on:
 jobs:
   demo:
     name: Demonstrate runner
-    runs-on: runner@localhost.runner
+    runs-on: "runner@localhost"
+    strategy:
+      matrix:
+        runner: [1, 2, 3, 4, 5]
     steps:
       - name: Debug
         run: |
-          echo "Who am I: $(whoami)"
-          echo "Hostname: $(hostname -f)"
-          echo "Environment:"
-          env
+          echo "Who am I: $(whoami)" >> $GITHUB_STEP_SUMMARY
+          echo "Hostname: $(hostname -f)"  >> $GITHUB_STEP_SUMMARY
+          echo "Environment:" >> $GITHUB_STEP_SUMMARY
+          env >> $GITHUB_STEP_SUMMARY
+          ping google.com -c10 >> $GITHUB_STEP_SUMMARY
