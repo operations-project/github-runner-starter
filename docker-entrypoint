@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+set -e
+
+start() {
+  export RUNNER_NUMBER=$(./whichami)
+  export RUNNER_CONFIG_NAME="$(whoami)${RUNNER_NUMBER}@$(hostname -f)"
+
+  line
+  say "Welcome to docker-entrypoint."
+  say "Setting runner name using RUNNER_NUMBER"
+  line
+  say "Launching runner ${RUNNER_CONFIG_NAME}..."
+  line
+  exec "${@}"
+
+}
+say() {
+  echo " git-runners-entrypoint | ${*}"
+}
+line() {
+  CHARACTER="${CHARACTER:--}"
+  COLUMNS="${COLUMNS:-$(tput cols -T xterm)}"
+  printf '%*s\n' "${COLUMNS}" '' | tr ' ' "${CHARACTER}"
+}
+
+start "${@}"

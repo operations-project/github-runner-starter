@@ -4,6 +4,8 @@ FROM geerlingguy/docker-${MOLECULE_DISTRO:-rockylinux8}-ansible:latest
 
 RUN useradd runner
 RUN yum install -y \
+    bind-utils \
+    net-tools \
     git \
     jq
 

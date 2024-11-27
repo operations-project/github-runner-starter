@@ -5,11 +5,15 @@ services:
   runner:
 #    image: geerlingguy/docker-${MOLECULE_DISTRO:-rockylinux8}-ansible:latest
     image: jonpugh/github-runner
-    hostname: ${DOCKER_HOSTNAME:-localhost.runner}
+    hostname: localhost
     volumes:
       - ./:/github-runner
     environment:
       GITHUB_TOKEN: ${GITHUB_TOKEN}
       GITHUB_REPOSITORY: jonpugh/github-runner
-    entrypoint: /github-runner/github-runner
+    entrypoint: ./docker-entrypoint
+    command: ./github-runner
     build: ./
+
+    # Give the containers more time to shutdown before being cancelled.
+    stop_grace_period: 10s
