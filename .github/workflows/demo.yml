@@ -7,7 +7,7 @@ on:
 jobs:
   demo:
     name: Demonstrate runner
-    runs-on: "runner${{ matrix.runner }}@localhost"
+    runs-on: "runner@localhost"
     strategy:
       matrix:
         runner: [1, 2, 3, 4, 5]
