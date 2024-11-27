@@ -215,7 +215,20 @@ verify() {
     exit 1
   fi
 }
-# @TODO: Install for the right architecture.
+currentArchitecture() {
+  architecture=$(uname -m)
+  case "$architecture" in
+      x86_64)
+          echo "x64"
+          ;;
+      aarch64 | arm64)
+          echo "arm64"
+          ;;
+      *)
+          exit 1
+          ;;
+  esac
+}
 latestVersion() {
   RUNNER_CLI_REPO=actions/runner
   curl -s -L \
@@ -230,11 +243,16 @@ download() {
   TAR_PATH="${RUNNER_FOLDER}/actions-runner.tar.gz"
   RUNNER_CLI_VERSION="${RUNNER_CLI_VERSION:-$(latestVersion)}"
   RUNNER_CLI_VERSION=${RUNNER_CLI_VERSION/?}
+  RUNNER_CLI_ARCH="${RUNNER_CLI_VERSION:-$(currentArchitecture)}"
   if [[ -z "${RUNNER_CLI_VERSION}" ]]; then
     say "Unable to determine CLI version. Check GITHUB_TOKEN."
     exit 1
   fi
-  TAR_URL="https://github.com/actions/runner/releases/download/v${RUNNER_CLI_VERSION}/actions-runner-linux-x64-${RUNNER_CLI_VERSION}.tar.gz"
+  if [[ -z "${RUNNER_CLI_ARCH}" ]]; then
+    say "Unable to determine architecture using 'uname -m'."
+    exit 1
+  fi
+  TAR_URL="https://github.com/actions/runner/releases/download/v${RUNNER_CLI_VERSION}/actions-runner-linux-${RUNNER_CLI_ARCH}-${RUNNER_CLI_VERSION}.tar.gz"
   say "Downloading ${TAR_URL}"
   if [[ ! -f $TAR_PATH ]]; then
     line
