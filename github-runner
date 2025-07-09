@@ -9,7 +9,7 @@ start() {
 
 
   if [[ -n $RUNNER_CONFIG ]]; then
-    say Launching runner with run.sh ...
+    say Configuring runner with config.sh ...
     line
     configure
   else
@@ -30,8 +30,8 @@ start() {
     wait $RUNNER_PID
 
   else
-    say Launching runner with run.sh ... SKIPPED.
-    say Exiting github-runner.
+    say Skipped running due to --no-run option.
+    say Exiting github-runner-installer.
   fi
 
 }
@@ -52,6 +52,9 @@ info() {
   say "Repo: ${RUNNER_URL_REPO}"
   say "Labels: ${RUNNER_CONFIG_LABELS}"
   say "Status: ${RUNNER_URL_RUNNERS}"
+  line
+  say "Run: ${RUNNER_RUN:-no}"
+
 }
 usage() {
   say GitHub Runner Script
@@ -76,9 +79,9 @@ verify() {
   # Detect path to this script.
   # @TODO: Rename RUNNER_SCRIPT_ to reduce confusion with github runner CLI
   if [[ -z "$COMPOSER_RUNTIME_BIN_DIR" ]]; then
-    RUNNER_SCRIPT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/github-runner"
+    RUNNER_SCRIPT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/github-runner-installer"
   else
-    RUNNER_SCRIPT_PATH="$COMPOSER_RUNTIME_BIN_DIR/github-runner"
+    RUNNER_SCRIPT_PATH="$COMPOSER_RUNTIME_BIN_DIR/github-runner-installer"
   fi
   if [[ ! -f "${RUNNER_SCRIPT_PATH}" ]]; then
      say "Path detection failed."
@@ -280,8 +283,10 @@ configure() {
   # Remove
   # @TODO: If runner has a job, wait for it to complete.
   cd $RUNNER_FOLDER
+  echo ./config.sh remove --token ${RUNNER_CONFIG_TOKEN}
   ./config.sh remove --token ${RUNNER_CONFIG_TOKEN} || say "config remove didn't work."
 
+  rm -rf .credentials .runner
   line
   say Configuring new runner...
 
@@ -329,7 +334,7 @@ cancel() {
   exit 1
 }
 say() {
-  echo " github-runner | ${*}"
+  echo " github-runner-installer | ${*}"
 }
 line() {
   CHARACTER="${CHARACTER:--}"
