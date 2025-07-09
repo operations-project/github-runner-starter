@@ -7,13 +7,13 @@ services:
     image: jonpugh/github-runner
     hostname: localhost
     volumes:
-      - ./:/github-runner
+      - ./:/github-runner-installer
     environment:
       GITHUB_TOKEN: ${GITHUB_TOKEN}
       GITHUB_REPOSITORY: jonpugh/github-runner
       RUNNER_CONFIG_LABELS: ${RUNNER_CONFIG_LABELS:-runner@localhost}
     entrypoint: ./docker-entrypoint
-    command: ./github-runner
+    command: ./github-runner-installer
     build: ./
 
     # Give the containers more time to shutdown before being cancelled.

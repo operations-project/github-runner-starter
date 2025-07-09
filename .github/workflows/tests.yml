@@ -40,11 +40,11 @@ jobs:
       - name: Help
         run: |
           echo "Hi from .github/workflows/tests.yml!"
-          ./github-runner --help
+          ./github-runner-installer --help
 
       - name: Run
         run: |
-          ./github-runner \
+          ./github-runner-installer \
             --name=${RUNNER_CONFIG_NAME} \
             --config-sh-options=--ephemeral
 

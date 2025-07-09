@@ -11,6 +11,6 @@
     ],
     "require": {},
     "bin": [
-        "github-runner"
+        "github-runner-installer"
     ]
 }

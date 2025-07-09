@@ -10,15 +10,15 @@ RUN yum install -y \
     jq
 
 # This codebase. The runner wrapper script.
-COPY ./ /github-runner
-WORKDIR /github-runner
+COPY ./ /github-runner-installer
+WORKDIR /github-runner-installer
 RUN chown runner:runner . -R
 
 # GitHub Runner code.
 # Install runner to a path that won't ever be in a volume.
 ENV RUNNER_PATH /usr/share/github-runner
 # We are installing as root then switching back because we need to use the install-dependencies script.
-RUN ./github-runner --no-run --no-config --runner-path=${RUNNER_PATH}
+RUN ./github-runner-installer --no-run --no-config --runner-path=${RUNNER_PATH}
 RUN ${RUNNER_PATH}/bin/installdependencies.sh
 RUN chown runner:runner ${RUNNER_PATH} -R
 
