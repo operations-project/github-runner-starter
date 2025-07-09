@@ -45,6 +45,7 @@ jobs:
       - name: Run
         run: |
           ./github-runner-installer \
+            --run \
             --name=${RUNNER_CONFIG_NAME} \
             --config-sh-options=--ephemeral
 

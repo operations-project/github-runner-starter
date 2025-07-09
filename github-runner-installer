@@ -64,7 +64,7 @@ usage() {
   echo "--repo (GITHUB_REPOSITORY) The GitHub repo to install the runner on. (eg. owner/repo)"
   echo "--name (RUNNER_CONFIG_NAME) The name to give the runner. (Default: $(whoami)@$(hostname -f))"
   echo "--labels (RUNNER_CONFIG_LABELS) A list of labels to assign to the runner. (Default: $(whoami)@$(hostname -f))"
-  echo "--no-run (RUNNER_RUN)    If empty, don't run."
+  echo "--run (RUNNER_RUN) Launch the runner with run.sh after installing."
   echo "--config-sh-options (RUNNER_CONFIG_OPTIONS) Pass options to the github runner config.sh command."
 }
 verify() {
@@ -97,7 +97,7 @@ verify() {
   RUNNER_CONFIG_OPTIONS=${RUNNER_CONFIG_OPTIONS:-""}
 
   # Whether to run the runner
-  RUNNER_RUN=${RUNNER_RUN:-"yes"}
+  RUNNER_RUN=${RUNNER_RUN:-""}
   RUNNER_CONFIG=${RUNNER_CONFIG:-"yes"}
 
   # Command line Options
@@ -135,8 +135,8 @@ verify() {
              RUNNER_CONFIG_OPTIONS="${1#*=}"
              ;;
 
-          --no-run)
-              RUNNER_RUN=""
+          --run)
+              RUNNER_RUN="yes"
               ;;
 
           --no-config)
