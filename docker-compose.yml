@@ -10,7 +10,7 @@ services:
       - ./:/github-runner-installer
     environment:
       GITHUB_TOKEN: ${GITHUB_TOKEN}
-      GITHUB_REPOSITORY: jonpugh/github-runner
+      GITHUB_REPOSITORY: operations-project/github-runner-installer
       RUNNER_CONFIG_LABELS: ${RUNNER_CONFIG_LABELS:-runner@localhost}
     entrypoint: ./docker-entrypoint
     command: ./github-runner-installer

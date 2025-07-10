@@ -93,7 +93,7 @@ verify() {
   # Defaults. If ENV vars exist, use them. If not, use these values.
   RUNNER_PATH=${RUNNER_PATH:-"runner"}
   RUNNER_CONFIG_NAME=${RUNNER_CONFIG_NAME:-$(whoami)@$(hostname -f)}
-  RUNNER_CONFIG_LABELS=${RUNNER_CONFIG_LABELS:-"jonpugh/github-runner-installer"}
+  RUNNER_CONFIG_LABELS=${RUNNER_CONFIG_LABELS:-"operations-project/github-runner-installer"}
   RUNNER_CONFIG_OPTIONS=${RUNNER_CONFIG_OPTIONS:-""}
 
   # Whether to run the runner
