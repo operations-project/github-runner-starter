@@ -294,11 +294,9 @@ configure() {
   say $CMD
   line
 
-  $CMD
+  $CMD && say GitHub runner configured! || say GitHub Runner Config failed. Moving on...
 
   line
-  say GitHub runner configured:
-  info
 
 }
 
