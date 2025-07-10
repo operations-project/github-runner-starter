@@ -32,10 +32,10 @@ jobs:
 
       - name: Debug
         run: |
-          echo "Who am I: $(whoami)"
-          echo "Hostname: $(hostname -f)"
-          echo "Environment:"
-          env
+          echo "Who am I: $(whoami)@$(hostname -f)"
+          echo "Where am I: $(whoami)"
+          echo "Env:"
+          env | grep GITHUB
 
       - name: Help
         run: |
