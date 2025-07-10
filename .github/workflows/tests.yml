@@ -49,6 +49,13 @@ jobs:
             --name=${RUNNER_CONFIG_NAME} \
             --config-sh-options=--ephemeral
 
+      - name: Run again
+        run: |
+          ./github-runner-installer \
+            --run \
+            --name=${RUNNER_CONFIG_NAME} \
+            --config-sh-options=--ephemeral
+
   run:
     name: Run Tasks
     runs-on: "jonpugh@github-runner.${{ github.run_id }}"
@@ -64,3 +71,7 @@ jobs:
           echo "Hostname: $(hostname -f)"
           echo "Environment:"
           env
+
+      - name: A second task
+        run: |
+          echo "Confirmed."
