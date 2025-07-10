@@ -93,7 +93,7 @@ verify() {
   # Defaults. If ENV vars exist, use them. If not, use these values.
   RUNNER_PATH=${RUNNER_PATH:-"runner"}
   RUNNER_CONFIG_NAME=${RUNNER_CONFIG_NAME:-$(whoami)@$(hostname -f)}
-  RUNNER_CONFIG_LABELS=${RUNNER_CONFIG_LABELS:-"jonpugh/github-runner-installer"}
+  RUNNER_CONFIG_LABELS=${RUNNER_CONFIG_LABELS:-"operations-project/github-runner-installer"}
   RUNNER_CONFIG_OPTIONS=${RUNNER_CONFIG_OPTIONS:-""}
 
   # Whether to run the runner
@@ -278,17 +278,7 @@ download() {
 configure() {
   line
   say Configuring GitHub runner...
-  say Removing existing runner...
-
-  # Remove
-  # @TODO: If runner has a job, wait for it to complete.
   cd $RUNNER_FOLDER
-  echo ./config.sh remove --token ${RUNNER_CONFIG_TOKEN}
-  ./config.sh remove --token ${RUNNER_CONFIG_TOKEN} || say "config remove didn't work."
-
-  rm -rf .credentials .runner
-  line
-  say Configuring new runner...
 
   # Configure
   CMD="./config.sh \
