@@ -33,7 +33,7 @@ jobs:
       - name: Debug
         run: |
           echo "Who am I: $(whoami)@$(hostname -f)"
-          echo "Where am I: $(whoami)"
+          echo "Where am I: $(pwd)"
           echo "Env:"
           env | grep GITHUB
 
