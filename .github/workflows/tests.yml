@@ -26,7 +26,7 @@ jobs:
 
     strategy:
       matrix:
-        runner: [1,2,3,4,5]
+        runner: [1,2,3]
     steps:
       - uses: actions/checkout@v4
 
@@ -54,7 +54,7 @@ jobs:
     runs-on: "jonpugh@github-runner.${{ github.run_id }}"
     strategy:
       matrix:
-        runner: [1,2,3,4,5]
+        runner: [1,2,3]
     steps:
       - uses: actions/checkout@v4
 
