@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 env:
-  # https://github.com/jonpugh/github-runner/settings/secrets/actions/JONPUGH_GITHUB_TOKEN_ADMIN
+  # https://github.com/operations-project/github-runner-starter/settings/secrets/actions/JONPUGH_GITHUB_TOKEN_ADMIN
   GITHUB_TOKEN: "${{ secrets.JONPUGH_GITHUB_TOKEN_ADMIN }}"
   RUNNER_CONFIG_NAME: "jonpugh@github-runner.${{ github.run_id }}"
 
@@ -15,7 +15,7 @@ jobs:
   create:
     name: Create Runner
     # Testing github hosted.
-    # runs-on: jonpugh/github-runner
+    # runs-on: operations-project/github-runner-starter
     runs-on: ubuntu-latest
     env:
       # Set unique name for each item in the matrix.
