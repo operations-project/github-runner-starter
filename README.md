@@ -23,8 +23,6 @@ This project also includes a minimal Docker setup for local testing and examples
 - Network access to GitHub
 - A GitHub Personal Access Token (classic) or PAT with appropriate scopes: needs `repo` access and "self-hosted runners" administration for the target repository. Practically, you’ll want a token that can create registration tokens on the repository (often described here as admin:write on the repo in this script’s messages).
 
-Note: The script currently downloads Linux runners. If running on another OS, adapt accordingly.
-
 ## Installation
 You can use the script directly, or install it via Composer so `github-runner-starter` is available on your PATH.
 
