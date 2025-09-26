@@ -1,5 +1,7 @@
 # github-runner-starter
 
+<img width="1798" height="1612" alt="image" src="https://github.com/user-attachments/assets/63705306-b13c-4bfe-b5c3-91ab26a7b20a" />
+
 A single Bash script to install, configure, optionally launch, and clean up GitHub self-hosted runners. It automates:
 - Downloading the proper Actions Runner build for your OS/arch
 - Getting a registration token via the GitHub API
