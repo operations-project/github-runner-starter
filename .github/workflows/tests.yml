@@ -26,25 +26,33 @@ jobs:
 
     strategy:
       matrix:
-        runner: [1,2,3,4,5]
+        runner: [1,2,3]
     steps:
       - uses: actions/checkout@v4
 
       - name: Debug
         run: |
-          echo "Who am I: $(whoami)"
-          echo "Hostname: $(hostname -f)"
-          echo "Environment:"
-          env
+          echo "Who am I: $(whoami)@$(hostname -f)"
+          echo "Where am I: $(pwd)"
+          echo "Env:"
+          env | grep GITHUB
 
       - name: Help
         run: |
           echo "Hi from .github/workflows/tests.yml!"
-          ./github-runner --help
+          ./github-runner-installer --help
 
       - name: Run
         run: |
-          ./github-runner \
+          ./github-runner-installer \
+            --run \
+            --name=${RUNNER_CONFIG_NAME} \
+            --config-sh-options=--ephemeral
+
+      - name: Run again
+        run: |
+          ./github-runner-installer \
+            --run \
             --name=${RUNNER_CONFIG_NAME} \
             --config-sh-options=--ephemeral
 
@@ -53,7 +61,7 @@ jobs:
     runs-on: "jonpugh@github-runner.${{ github.run_id }}"
     strategy:
       matrix:
-        runner: [1,2,3,4,5]
+        runner: [1,2,3,4,5,6]
     steps:
       - uses: actions/checkout@v4
 
@@ -63,3 +71,7 @@ jobs:
           echo "Hostname: $(hostname -f)"
           echo "Environment:"
           env
+
+      - name: A second task
+        run: |
+          echo "Confirmed."
