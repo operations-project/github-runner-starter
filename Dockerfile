@@ -10,8 +10,8 @@ RUN yum install -y \
     jq
 
 # This codebase. The runner wrapper script.
-COPY ./ /github-runner-installer
-WORKDIR /github-runner-installer
+COPY ./ /github-runner-starter
+WORKDIR /github-runner-starter
 RUN chown runner:runner . -R
 
 # GitHub Runner code.
@@ -22,8 +22,8 @@ ENV RUNNER_PATH /usr/share/github-runner
 RUN curl https://raw.githubusercontent.com/actions/runner/refs/tags/v2.326.0/src/Misc/layoutbin/installdependencies.sh -o install-dependencies \
     && bash install-dependencies
 
-# Run github-runner-installer script.
-#RUN ./github-runner-installer --no-run --no-config --runner-path=${RUNNER_PATH}
+# Run github-runner-starter script.
+#RUN ./github-runner-starter --no-run --no-config --runner-path=${RUNNER_PATH}
 
 # Change runner ownership & Switch user.
 # RUN chown runner:runner ${RUNNER_PATH} -R
