@@ -49,9 +49,9 @@ composer.json excerpt:
 
 Example with flags, including launching the runner immediately:
 ```
+export GITHUB_REPOSITORY=operations-project/github-runner-starter
+export GITHUB_TOKEN=ghp_***
 ./github-runner-starter \
-  --repo=owner/repo \
-  --token=ghp_... \
   --labels=my-runner,linux \
   --run
 ```
@@ -98,19 +98,17 @@ On SIGTERM (stop) the script attempts to stop the runner and unregister it using
 ## Examples
 - Configure only (no immediate run):
 ```
-./github-runner-starter --repo=owner/repo --token=ghp_...
+./github-runner-starter
 ```
 
 - Configure and run:
 ```
-./github-runner-starter --repo=owner/repo --token=ghp_... --run
+./github-runner-starter --run
 ```
 
 - Custom path and labels:
 ```
 ./github-runner-starter \
-  --repo=owner/repo \
-  --token=ghp_... \
   --runner-path=/opt/gh-runner \
   --labels=linux,x64
 ```
@@ -118,8 +116,6 @@ On SIGTERM (stop) the script attempts to stop the runner and unregister it using
 - Pass extra options to config.sh:
 ```
 ./github-runner-starter \
-  --repo=owner/repo \
-  --token=ghp_... \
   --config-sh-options="--ephemeral"
 ```
 
