@@ -32,7 +32,7 @@ start() {
 
   else
     say Skipped running due to --no-run option.
-    say Exiting github-runner-installer.
+    say Exiting github-runner-starter.
   fi
 
 }
@@ -80,9 +80,9 @@ verify() {
   # Detect path to this script.
   # @TODO: Rename RUNNER_SCRIPT_ to reduce confusion with github runner CLI
   if [[ -z "$COMPOSER_RUNTIME_BIN_DIR" ]]; then
-    RUNNER_SCRIPT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/github-runner-installer"
+    RUNNER_SCRIPT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/github-runner-starter"
   else
-    RUNNER_SCRIPT_PATH="$COMPOSER_RUNTIME_BIN_DIR/github-runner-installer"
+    RUNNER_SCRIPT_PATH="$COMPOSER_RUNTIME_BIN_DIR/github-runner-starter"
   fi
   if [[ ! -f "${RUNNER_SCRIPT_PATH}" ]]; then
      say "Path detection failed."
@@ -94,7 +94,7 @@ verify() {
   # Defaults. If ENV vars exist, use them. If not, use these values.
   RUNNER_PATH=${RUNNER_PATH:-"runner"}
   RUNNER_CONFIG_NAME=${RUNNER_CONFIG_NAME:-$(whoami)@$(hostname -f)}
-  RUNNER_CONFIG_LABELS=${RUNNER_CONFIG_LABELS:-"operations-project/github-runner-installer"}
+  RUNNER_CONFIG_LABELS=${RUNNER_CONFIG_LABELS:-"operations-project/github-runner-starter"}
   RUNNER_CONFIG_OPTIONS=${RUNNER_CONFIG_OPTIONS:-""}
 
   # Whether to run the runner
@@ -325,7 +325,7 @@ cancel() {
   exit 1
 }
 say() {
-  echo " github-runner-installer | ${*}"
+  echo " github-runner-starter | ${*}"
 }
 line() {
   CHARACTER="${CHARACTER:--}"
