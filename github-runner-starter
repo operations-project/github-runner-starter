@@ -241,6 +241,23 @@ latestVersion() {
     https://api.github.com/repos/${RUNNER_CLI_REPO}/releases | \
     jq -r '.[0].name'
 }
+currentOS() {
+  # Detects the OS as expected by the actions/runner release filenames
+  # Returns: linux | osx
+  uname_s=$(uname -s)
+  case "$uname_s" in
+      Linux)
+          echo "linux"
+          ;;
+      Darwin)
+          echo "osx"
+          ;;
+      *)
+          say "Unsupported OS: $uname_s"
+          exit 1
+          ;;
+  esac
+}
 # @TODO: Detect curl fail
 download() {
   cd ${RUNNER_FOLDER}
@@ -256,7 +273,8 @@ download() {
     say "Unable to determine architecture using 'uname -m'."
     exit 1
   fi
-  TAR_URL="https://github.com/actions/runner/releases/download/v${RUNNER_CLI_VERSION}/actions-runner-linux-${RUNNER_CLI_ARCH}-${RUNNER_CLI_VERSION}.tar.gz"
+  RUNNER_CLI_OS="${RUNNER_CLI_OS:-$(currentOS)}"
+  TAR_URL="https://github.com/actions/runner/releases/download/v${RUNNER_CLI_VERSION}/actions-runner-${RUNNER_CLI_OS}-${RUNNER_CLI_ARCH}-${RUNNER_CLI_VERSION}.tar.gz"
   say "Downloading ${TAR_URL}"
   if [[ ! -f $TAR_PATH ]]; then
     line
