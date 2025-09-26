@@ -93,7 +93,6 @@ verify() {
   # Defaults. If ENV vars exist, use them. If not, use these values.
   RUNNER_PATH=${RUNNER_PATH:-"runner"}
   RUNNER_CONFIG_NAME=${RUNNER_CONFIG_NAME:-$(whoami)@$(hostname -f)}
-  RUNNER_CONFIG_LABELS=${RUNNER_CONFIG_LABELS:-"operations-project/github-runner-starter"}
   RUNNER_CONFIG_OPTIONS=${RUNNER_CONFIG_OPTIONS:-""}
 
   # Whether to run the runner
@@ -151,6 +150,7 @@ verify() {
   # Helpful URLs
   RUNNER_URL_REPO="https://github.com/${GITHUB_REPOSITORY}"
   RUNNER_URL_RUNNERS="${RUNNER_URL_REPO}/settings/actions/runners"
+  RUNNER_CONFIG_LABELS=${RUNNER_CONFIG_LABELS:-${GITHUB_REPOSITORY}
 
   line
   welcome

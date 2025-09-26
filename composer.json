@@ -1,6 +1,6 @@
 {
-    "name": "operations/github-runner-starter",
-    "description": "A shell script for installing, configuring, and launching github runners in a single process.",
+    "name": "jonpugh/github-runner",
+    "description": "A shell script for launching github runners.",
     "type": "library",
     "license": "MIT",
     "authors": [
